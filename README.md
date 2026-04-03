@@ -11,6 +11,7 @@ A base compiler example, developed with Flex and Bison.
 * [Commands](#commands)
 * [CI/CD](#cicd)
 * [Recommended Extensions](#recommended-extensions)
+* [Documentation](#Documentation)
 
 ## Requirements
 
@@ -100,3 +101,7 @@ To trigger an automatic integration on every push or PR (_Pull Request_), you mu
 * [C/C++](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
 * [CMake Tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cmake-tools)
 * [Yash](https://marketplace.visualstudio.com/items?itemName=daohong-emilio.yash)
+
+# Documentation
+
+All the documentation including the Stages can be found in the docs folder
