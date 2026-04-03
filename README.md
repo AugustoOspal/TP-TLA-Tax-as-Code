@@ -104,4 +104,4 @@ To trigger an automatic integration on every push or PR (_Pull Request_), you mu
 
 # Documentation
 
-All the documentation including the Stages can be found in the docs folder
+All the documentation including the Stages can be found in the doc folder
