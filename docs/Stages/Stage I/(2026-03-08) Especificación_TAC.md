@@ -27,7 +27,7 @@ Diseño e Implementación de un Lenguaje
 
 2. # Repositorio {#repositorio}
 
-La solución será versionada en: [**https://github.com/manuel-sunol/tla-tp**](https://github.com/manuel-sunol/tla-tp).
+La solución será versionada en: [**https://github.com/AugustoOspal/TP-TLA-Tax-as-Code**](https://github.com/AugustoOspal/TP-TLA-Tax-as-Code)
 
 3. # Dominio {#dominio}
 
