@@ -1,0 +1,1 @@
+- [ ] Actualizar LICENSE.md (mirar abajo de todo las indicaciones) 
