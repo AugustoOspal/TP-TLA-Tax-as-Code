@@ -14,27 +14,16 @@
  * @see https://westes.github.io/flex/manual/Definitions-Section.html#Definitions-Section
  */
 
-extern CompilationStatus ArithmeticOperatorLexemeAction(TokenLabel label);
-extern CompilationStatus EnterImportExpressionLexemeAction(FlexContext context);
-extern CompilationStatus EnterMultilineCommentLexemeAction(FlexContext context);
+extern CompilationStatus TokenLexemeAction(TokenLabel label);
+extern CompilationStatus IdentifierLexemeAction();
+extern CompilationStatus NumberLexemeAction();
+extern CompilationStatus StringLexemeAction();
+extern CompilationStatus BooleanLexemeAction(bool value);
 extern CompilationStatus EOFLexemeAction();
 extern CompilationStatus IgnoredLexemeAction();
-extern CompilationStatus IntegerLexemeAction();
-extern CompilationStatus LeaveImportExpressionLexemeAction();
-extern CompilationStatus LeaveMultilineCommentLexemeAction();
-extern CompilationStatus ParenthesisLexemeAction(TokenLabel label);
-extern CompilationStatus SubexpressionLexemeAction();
 extern CompilationStatus UnknownLexemeAction();
 
 %}
-
-/**
- * Flex contexts (a.k.a. start conditions).
- *
- * @see https://westes.github.io/flex/manual/Start-Conditions.html
- */
-%x IMPORT_EXPRESSION
-%x MULTILINE_COMMENT
 
 /**
  * Reusable patterns.
@@ -42,7 +31,7 @@ extern CompilationStatus UnknownLexemeAction();
  * @see https://westes.github.io/flex/manual/Matching.html
  * @see https://westes.github.io/flex/manual/Patterns.html
  */
-whitespace			[[:space:]]+
+whitespace			[ \t\n\r]+
 
 %%
 
@@ -54,30 +43,35 @@ whitespace			[[:space:]]+
 
 %}
 
-"{"									{ return EnterImportExpressionLexemeAction(IMPORT_EXPRESSION); }
-<IMPORT_EXPRESSION>[^{}]+			{ return SubexpressionLexemeAction(); }
-<IMPORT_EXPRESSION>"}"				{ return LeaveImportExpressionLexemeAction(); }
-<IMPORT_EXPRESSION>.				{ return UnknownLexemeAction(); }
+"cliente"							{ return TokenLexemeAction(KW_CLIENTE); }
+"proveedor"							{ return TokenLexemeAction(KW_PROVEEDOR); }
+"monotributista"					{ return TokenLexemeAction(KW_MONOTRIBUTISTA); }
+"regla_facturacion"					{ return TokenLexemeAction(KW_REGLA_FACTURACION); }
+"regla_pago"						{ return TokenLexemeAction(KW_REGLA_PAGO); }
 
-"/*"								{ return EnterMultilineCommentLexemeAction(MULTILINE_COMMENT); }
-<MULTILINE_COMMENT>"*/"				{ return LeaveMultilineCommentLexemeAction(); }
-<MULTILINE_COMMENT>[^*]+			{ return IgnoredLexemeAction(); }
-<MULTILINE_COMMENT>.				{ return IgnoredLexemeAction(); }
+"verdadero"							{ return BooleanLexemeAction(true); }
+"falso"								{ return BooleanLexemeAction(false); }
 
-"-"									{ return ArithmeticOperatorLexemeAction(SUB); }
-"*"									{ return ArithmeticOperatorLexemeAction(MUL); }
-"/"									{ return ArithmeticOperatorLexemeAction(DIV); }
-"+"									{ return ArithmeticOperatorLexemeAction(ADD); }
+"menor"[[:space:]]+"o"[[:space:]]+"igual"[[:space:]]+"a"	{ return TokenLexemeAction(OP_LE); }
+"mayor"[[:space:]]+"o"[[:space:]]+"igual"[[:space:]]+"a"	{ return TokenLexemeAction(OP_GE); }
+"igual"[[:space:]]+"a"				{ return TokenLexemeAction(OP_EQ); }
 
-"("									{ return ParenthesisLexemeAction(OPEN_PARENTHESIS); }
-")"									{ return ParenthesisLexemeAction(CLOSE_PARENTHESIS); }
+"{"									{ return TokenLexemeAction(OPEN_BRACE); }
+"}"									{ return TokenLexemeAction(CLOSE_BRACE); }
+"-"									{ return TokenLexemeAction(BULLET); }
+":"									{ return TokenLexemeAction(COLON); }
 
-[[:digit:]]+						{ return IntegerLexemeAction(); }
+[[:alpha:]_][[:alnum:]_]*			{ return IdentifierLexemeAction(); }
+[[:digit:]]+(\.[[:digit:]]+)?		{ return NumberLexemeAction(); }
+\"[^"]*\"							{ return StringLexemeAction(); }
+
+"#".*								{ return IgnoredLexemeAction(); }
 
 {whitespace}						{ return IgnoredLexemeAction(); }
 .									{ return UnknownLexemeAction(); }
 
 <<EOF>>								{ return EOFLexemeAction(); }
+
 
 %%
 

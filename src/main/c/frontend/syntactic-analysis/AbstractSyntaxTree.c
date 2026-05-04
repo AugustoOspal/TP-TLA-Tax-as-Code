@@ -20,51 +20,85 @@ ModuleDestructor initializeAbstractSyntaxTreeModule() {
 
 /* PUBLIC FUNCTIONS */
 
-void destroyConstant(Constant * constant) {
-	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
-	if (constant != NULL) {
-		free(constant);
-	}
+void destroyValue(Value * value) {
+    logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
+    if (value != NULL) {
+        if (value->type == STRING_VALUE && value->string != NULL) {
+            free(value->string);
+        }
+        free(value);
+    }
 }
 
-void destroyExpression(Expression * expression) {
-	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
-	if (expression != NULL) {
-		switch (expression->type) {
-			case ADDITION:
-			case DIVISION:
-			case MULTIPLICATION:
-			case SUBTRACTION:
-				destroyExpression(expression->leftExpression);
-				destroyExpression(expression->rightExpression);
-				break;
-			case FACTOR:
-				destroyFactor(expression->factor);
-				break;
-		}
-		free(expression);
-	}
+void destroyAttribute(Attribute * attribute) {
+    logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
+    if (attribute != NULL) {
+        if (attribute->name != NULL) {
+            free(attribute->name);
+        }
+        destroyValue(attribute->value);
+        destroyAttribute(attribute->next);
+        free(attribute);
+    }
 }
 
-void destroyFactor(Factor * factor) {
-	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
-	if (factor != NULL) {
-		switch (factor->type) {
-			case CONSTANT:
-				destroyConstant(factor->constant);
-				break;
-			case EXPRESSION:
-				destroyExpression(factor->expression);
-				break;
-		}
-		free(factor);
-	}
+void destroyEntity(Entity * entity) {
+    logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
+    if (entity != NULL) {
+        if (entity->name != NULL) {
+            free(entity->name);
+        }
+        destroyAttribute(entity->attributes);
+        destroyEntity(entity->next);
+        free(entity);
+    }
+}
+
+void destroyCondition(Condition * condition) {
+    logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
+    if (condition != NULL) {
+        if (condition->field != NULL) {
+            free(condition->field);
+        }
+        destroyValue(condition->value);
+        destroyCondition(condition->next);
+        free(condition);
+    }
+}
+
+void destroyRule(Rule * rule) {
+    logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
+    if (rule != NULL) {
+        if (rule->name != NULL) {
+            free(rule->name);
+        }
+        destroyCondition(rule->conditions);
+        destroyRule(rule->next);
+        free(rule);
+    }
+}
+
+void destroyDeclaration(Declaration * declaration) {
+    logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
+    if (declaration != NULL) {
+        switch (declaration->type) {
+            case ENTITY_DECLARATION:
+                destroyEntity(declaration->entity);
+                break;
+            case RULE_DECLARATION:
+                destroyRule(declaration->rule);
+                break;
+        }
+        destroyDeclaration(declaration->next);
+        free(declaration);
+    }
 }
 
 void destroyProgram(Program * program) {
-	logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
-	if (program != NULL) {
-		destroyExpression(program->expression);
-		free(program);
-	}
+    logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
+    if (program != NULL) {
+        destroyDeclaration(program->declarations);
+        free(program);
+    }
 }
+

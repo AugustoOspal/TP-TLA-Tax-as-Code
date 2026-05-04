@@ -1,0 +1,4 @@
+regla_facturacion "Invalid Operator" {
+    - campo menor a 10
+}
+# 'menor a' no está definido en el lexer (solo 'menor o igual a')

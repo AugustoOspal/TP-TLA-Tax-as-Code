@@ -36,50 +36,114 @@ static void _logSyntacticAnalyzerAction(const char * functionName) {
 
 /* PUBLIC FUNCTIONS */
 
-Constant * IntegerConstantSemanticAction(const int value) {
-	_logSyntacticAnalyzerAction(__FUNCTION__);
-	Constant * constant = calloc(1, sizeof(Constant));
-	constant->value = value;
-	return constant;
-}
-
-Expression * ArithmeticExpressionSemanticAction(Expression * leftExpression, Expression * rightExpression, ExpressionType type) {
-	_logSyntacticAnalyzerAction(__FUNCTION__);
-	Expression * expression = calloc(1, sizeof(Expression));
-	expression->leftExpression = leftExpression;
-	expression->rightExpression = rightExpression;
-	expression->type = type;
-	return expression;
-}
-
-Expression * FactorExpressionSemanticAction(Factor * factor) {
-	_logSyntacticAnalyzerAction(__FUNCTION__);
-	Expression * expression = calloc(1, sizeof(Expression));
-	expression->factor = factor;
-	expression->type = FACTOR;
-	return expression;
-}
-
-Factor * ConstantFactorSemanticAction(Constant * constant) {
-	_logSyntacticAnalyzerAction(__FUNCTION__);
-	Factor * factor = calloc(1, sizeof(Factor));
-	factor->constant = constant;
-	factor->type = CONSTANT;
-	return factor;
-}
-
-Factor * ExpressionFactorSemanticAction(Expression * expression) {
-	_logSyntacticAnalyzerAction(__FUNCTION__);
-	Factor * factor = calloc(1, sizeof(Factor));
-	factor->expression = expression;
-	factor->type = EXPRESSION;
-	return factor;
-}
-
-Program * ExpressionProgramSemanticAction(Expression * expression) {
+Program * ProgramSemanticAction(Declaration * declarations) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
 	Program * program = calloc(1, sizeof(Program));
-	program->expression = expression;
+	program->declarations = declarations;
 	_compilerState->abstractSyntaxtTree = program;
 	return program;
 }
+
+Declaration * DeclarationListSemanticAction(Declaration * list, Declaration * next) {
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+    Declaration * current = list;
+    while (current->next != NULL) {
+        current = current->next;
+    }
+    current->next = next;
+    return list;
+}
+
+Declaration * EntityDeclarationSemanticAction(Entity * entity) {
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+    Declaration * declaration = calloc(1, sizeof(Declaration));
+    declaration->type = ENTITY_DECLARATION;
+    declaration->entity = entity;
+    return declaration;
+}
+
+Declaration * RuleDeclarationSemanticAction(Rule * rule) {
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+    Declaration * declaration = calloc(1, sizeof(Declaration));
+    declaration->type = RULE_DECLARATION;
+    declaration->rule = rule;
+    return declaration;
+}
+
+Entity * EntitySemanticAction(char * name, Attribute * attributes) {
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+    Entity * entity = calloc(1, sizeof(Entity));
+    entity->name = name;
+    entity->attributes = attributes;
+    return entity;
+}
+
+Attribute * AttributeListSemanticAction(Attribute * list, Attribute * next) {
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+    Attribute * current = list;
+    while (current->next != NULL) {
+        current = current->next;
+    }
+    current->next = next;
+    return list;
+}
+
+Attribute * AttributeSemanticAction(char * name, Value * value) {
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+    Attribute * attribute = calloc(1, sizeof(Attribute));
+    attribute->name = name;
+    attribute->value = value;
+    return attribute;
+}
+
+Rule * RuleSemanticAction(char * name, Condition * conditions) {
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+    Rule * rule = calloc(1, sizeof(Rule));
+    rule->name = name;
+    rule->conditions = conditions;
+    return rule;
+}
+
+Condition * ConditionListSemanticAction(Condition * list, Condition * next) {
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+    Condition * current = list;
+    while (current->next != NULL) {
+        current = current->next;
+    }
+    current->next = next;
+    return list;
+}
+
+Condition * ConditionSemanticAction(char * field, RelationalOperator op, Value * value) {
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+    Condition * condition = calloc(1, sizeof(Condition));
+    condition->field = field;
+    condition->op = op;
+    condition->value = value;
+    return condition;
+}
+
+Value * StringValueSemanticAction(char * string) {
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+    Value * value = calloc(1, sizeof(Value));
+    value->type = STRING_VALUE;
+    value->string = string;
+    return value;
+}
+
+Value * NumberValueSemanticAction(double number) {
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+    Value * value = calloc(1, sizeof(Value));
+    value->type = NUMBER_VALUE;
+    value->number = number;
+    return value;
+}
+
+Value * BooleanValueSemanticAction(bool boolean) {
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+    Value * value = calloc(1, sizeof(Value));
+    value->type = BOOLEAN_VALUE;
+    value->boolean = boolean;
+    return value;
+}
+

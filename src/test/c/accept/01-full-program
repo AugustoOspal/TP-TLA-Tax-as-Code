@@ -1,0 +1,22 @@
+# Definición de entidades con sus atributos
+cliente "TechCorp SA" {
+    es_monotributista: falso
+    alicuota_iibb: 3.5
+    agente_retencion: verdadero
+}
+
+proveedor "Juan Perez Servicios" {
+    es_monotributista: verdadero
+    constancia_activa: verdadero
+}
+
+# Regla de negocio B2B basada en lo que pidió tu mamá
+regla_facturacion "Control Limite Monotributo" {
+    - monto menor o igual a 500000
+    - constancia_activa igual a verdadero
+}
+
+regla_pago "Retencion IIBB" {
+    - agente_retencion igual a verdadero
+    - monto mayor o igual a 10000
+}

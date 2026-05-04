@@ -1,0 +1,7 @@
+cliente "Minimal Cliente" {
+    id: "123"
+}
+
+regla_pago "Minimal Regla" {
+    - score mayor o igual a 0
+}
