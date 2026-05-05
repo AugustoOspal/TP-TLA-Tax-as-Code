@@ -1,0 +1,10 @@
+# Test de automatización asincrónica
+sincronizacion_padrones {
+    fuente: "ARBA"
+    frecuencia: "Diaria"
+}
+
+cierre_mensual "Liquidacion_Anual" {
+    generar_reporte: verdadero
+    notificar_cliente: verdadero
+}

@@ -1,0 +1,4 @@
+# 'factura' no es una palabra clave del lenguaje
+factura "A-0001" {
+    monto: 1000
+}

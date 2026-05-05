@@ -1,0 +1,4 @@
+# El porcentaje debe ir después del número
+cliente "Error" {
+    tasa: %21
+}

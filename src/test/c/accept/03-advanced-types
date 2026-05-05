@@ -1,0 +1,7 @@
+// Test de tipos avanzados: porcentajes, listas y tiempo
+cliente "Exportadora Global" {
+    iva_reducido: 10.5%
+    paises_destino: ["Brasil", "Uruguay", "Chile"]
+    fecha_limite: ultimo_dia_mes
+    configuracion: [verdadero, falso, 21%]
+}

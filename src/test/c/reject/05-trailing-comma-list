@@ -1,0 +1,4 @@
+# No se permiten comas al final sin un elemento siguiente
+cliente "Error" {
+    lista: [1, 2,]
+}

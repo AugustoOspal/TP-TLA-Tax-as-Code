@@ -1,0 +1,4 @@
+regla_exencion "Beneficio PyME" {
+    - facturacion menor o igual a 5000000
+    - es_pyme igual a verdadero
+}
