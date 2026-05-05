@@ -48,6 +48,10 @@ whitespace			[ \t\n\r]+
 "monotributista"					{ return TokenLexemeAction(KW_MONOTRIBUTISTA); }
 "regla_facturacion"					{ return TokenLexemeAction(KW_REGLA_FACTURACION); }
 "regla_pago"						{ return TokenLexemeAction(KW_REGLA_PAGO); }
+"regla_exencion"					{ return TokenLexemeAction(KW_REGLA_EXENCION); }
+"sincronizacion_padrones"			{ return TokenLexemeAction(KW_SINCRONIZACION_PADRONES); }
+"cierre_mensual"					{ return TokenLexemeAction(KW_CIERRE_MENSUAL); }
+"ultimo_dia_mes"					{ return TokenLexemeAction(KW_ULTIMO_DIA_MES); }
 
 "verdadero"							{ return BooleanLexemeAction(true); }
 "falso"								{ return BooleanLexemeAction(false); }
@@ -58,14 +62,18 @@ whitespace			[ \t\n\r]+
 
 "{"									{ return TokenLexemeAction(OPEN_BRACE); }
 "}"									{ return TokenLexemeAction(CLOSE_BRACE); }
+"["									{ return TokenLexemeAction(OPEN_BRACKET); }
+"]"									{ return TokenLexemeAction(CLOSE_BRACKET); }
 "-"									{ return TokenLexemeAction(BULLET); }
 ":"									{ return TokenLexemeAction(COLON); }
+"%"									{ return TokenLexemeAction(PERCENT); }
+","									{ return TokenLexemeAction(COMMA); }
 
 [[:alpha:]_][[:alnum:]_]*			{ return IdentifierLexemeAction(); }
 [[:digit:]]+(\.[[:digit:]]+)?		{ return NumberLexemeAction(); }
 \"[^"]*\"							{ return StringLexemeAction(); }
 
-"#".*								{ return IgnoredLexemeAction(); }
+("#"|"//").*						{ return IgnoredLexemeAction(); }
 
 {whitespace}						{ return IgnoredLexemeAction(); }
 .									{ return UnknownLexemeAction(); }

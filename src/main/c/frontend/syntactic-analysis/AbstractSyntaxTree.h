@@ -16,7 +16,10 @@ ModuleDestructor initializeAbstractSyntaxTreeModule();
 typedef enum ValueType {
     STRING_VALUE,
     NUMBER_VALUE,
-    BOOLEAN_VALUE
+    BOOLEAN_VALUE,
+    PERCENTAGE_VALUE,
+    TIME_VALUE,
+    LIST_VALUE
 } ValueType;
 
 typedef struct Value {
@@ -25,7 +28,9 @@ typedef struct Value {
         char * string;
         double number;
         bool boolean;
+        struct Value * list;
     };
+    struct Value * next;
 } Value;
 
 typedef struct Attribute {
@@ -34,7 +39,14 @@ typedef struct Attribute {
     struct Attribute * next;
 } Attribute;
 
+typedef enum EntityType {
+    CLIENTE,
+    PROVEEDOR,
+    MONOTRIBUTISTA
+} EntityType;
+
 typedef struct Entity {
+    EntityType type;
     char * name;
     Attribute * attributes;
     struct Entity * next;
@@ -53,15 +65,35 @@ typedef struct Condition {
     struct Condition * next;
 } Condition;
 
+typedef enum RuleType {
+    FACTURACION,
+    PAGO,
+    EXENCION
+} RuleType;
+
 typedef struct Rule {
+    RuleType type;
     char * name;
     Condition * conditions;
     struct Rule * next;
 } Rule;
 
+typedef enum TaskType {
+    SINCRONIZACION,
+    CIERRE
+} TaskType;
+
+typedef struct Task {
+    TaskType type;
+    char * name;
+    Attribute * attributes;
+    struct Task * next;
+} Task;
+
 typedef enum DeclarationType {
     ENTITY_DECLARATION,
-    RULE_DECLARATION
+    RULE_DECLARATION,
+    TASK_DECLARATION
 } DeclarationType;
 
 typedef struct Declaration {
@@ -69,6 +101,7 @@ typedef struct Declaration {
     union {
         Entity * entity;
         Rule * rule;
+        Task * task;
     };
     struct Declaration * next;
 } Declaration;
@@ -88,6 +121,7 @@ void destroyAttribute(Attribute * attribute);
 void destroyEntity(Entity * entity);
 void destroyCondition(Condition * condition);
 void destroyRule(Rule * rule);
+void destroyTask(Task * task);
 void destroyDeclaration(Declaration * declaration);
 void destroyProgram(Program * program);
 

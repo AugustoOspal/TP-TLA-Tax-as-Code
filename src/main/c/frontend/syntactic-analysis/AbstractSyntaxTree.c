@@ -23,9 +23,20 @@ ModuleDestructor initializeAbstractSyntaxTreeModule() {
 void destroyValue(Value * value) {
     logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
     if (value != NULL) {
-        if (value->type == STRING_VALUE && value->string != NULL) {
-            free(value->string);
+        switch (value->type) {
+            case STRING_VALUE:
+            case TIME_VALUE:
+                if (value->string != NULL) {
+                    free(value->string);
+                }
+                break;
+            case LIST_VALUE:
+                destroyValue(value->list);
+                break;
+            default:
+                break;
         }
+        destroyValue(value->next);
         free(value);
     }
 }
@@ -78,6 +89,18 @@ void destroyRule(Rule * rule) {
     }
 }
 
+void destroyTask(Task * task) {
+    logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
+    if (task != NULL) {
+        if (task->name != NULL) {
+            free(task->name);
+        }
+        destroyAttribute(task->attributes);
+        destroyTask(task->next);
+        free(task);
+    }
+}
+
 void destroyDeclaration(Declaration * declaration) {
     logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
     if (declaration != NULL) {
@@ -87,6 +110,9 @@ void destroyDeclaration(Declaration * declaration) {
                 break;
             case RULE_DECLARATION:
                 destroyRule(declaration->rule);
+                break;
+            case TASK_DECLARATION:
+                destroyTask(declaration->task);
                 break;
         }
         destroyDeclaration(declaration->next);

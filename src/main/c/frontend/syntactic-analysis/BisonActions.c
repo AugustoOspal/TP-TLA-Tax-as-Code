@@ -70,9 +70,18 @@ Declaration * RuleDeclarationSemanticAction(Rule * rule) {
     return declaration;
 }
 
-Entity * EntitySemanticAction(char * name, Attribute * attributes) {
+Declaration * TaskDeclarationSemanticAction(Task * task) {
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+    Declaration * declaration = calloc(1, sizeof(Declaration));
+    declaration->type = TASK_DECLARATION;
+    declaration->task = task;
+    return declaration;
+}
+
+Entity * EntitySemanticAction(EntityType type, char * name, Attribute * attributes) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
     Entity * entity = calloc(1, sizeof(Entity));
+    entity->type = type;
     entity->name = name;
     entity->attributes = attributes;
     return entity;
@@ -96,12 +105,22 @@ Attribute * AttributeSemanticAction(char * name, Value * value) {
     return attribute;
 }
 
-Rule * RuleSemanticAction(char * name, Condition * conditions) {
+Rule * RuleSemanticAction(RuleType type, char * name, Condition * conditions) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
     Rule * rule = calloc(1, sizeof(Rule));
+    rule->type = type;
     rule->name = name;
     rule->conditions = conditions;
     return rule;
+}
+
+Task * TaskSemanticAction(TaskType type, char * name, Attribute * attributes) {
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+    Task * task = calloc(1, sizeof(Task));
+    task->type = type;
+    task->name = name;
+    task->attributes = attributes;
+    return task;
 }
 
 Condition * ConditionListSemanticAction(Condition * list, Condition * next) {
@@ -145,5 +164,39 @@ Value * BooleanValueSemanticAction(bool boolean) {
     value->type = BOOLEAN_VALUE;
     value->boolean = boolean;
     return value;
+}
+
+Value * PercentageValueSemanticAction(double number) {
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+    Value * value = calloc(1, sizeof(Value));
+    value->type = PERCENTAGE_VALUE;
+    value->number = number;
+    return value;
+}
+
+Value * TimeValueSemanticAction(char * identifier) {
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+    Value * value = calloc(1, sizeof(Value));
+    value->type = TIME_VALUE;
+    value->string = identifier;
+    return value;
+}
+
+Value * ListValueSemanticAction(Value * list) {
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+    Value * value = calloc(1, sizeof(Value));
+    value->type = LIST_VALUE;
+    value->list = list;
+    return value;
+}
+
+Value * ValueListSemanticAction(Value * list, Value * next) {
+	_logSyntacticAnalyzerAction(__FUNCTION__);
+    Value * current = list;
+    while (current->next != NULL) {
+        current = current->next;
+    }
+    current->next = next;
+    return list;
 }
 
