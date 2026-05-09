@@ -2,9 +2,9 @@
 
 [![✗](https://github.com/AugustoOspal/TP-TLA-Tax-as-Code/actions/workflows/pipeline.yaml/badge.svg?branch=development)](https://github.com/AugustoOspal/TP-TLA-Tax-as-Code/actions/workflows/pipeline.yaml)
 
-# Flex-Bison-Compiler
+# Tax-as-Code (TaC) Compiler
 
-A base compiler example, developed with Flex and Bison.
+A domain-specific compiler developed with Flex and Bison for the Tax-as-Code (TaC) language, designed to automate tax logic, billing rules, and accounting workflows.
 
 * [Requirements](#requirements)
 * [Configuration](#configuration)
