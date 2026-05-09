@@ -1,0 +1,3 @@
+regla_pago "Test" {
+    - atributo invalido verdadero
+}

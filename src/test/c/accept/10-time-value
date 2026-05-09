@@ -1,0 +1,4 @@
+# Prueba de valor de tiempo
+proveedor "Test" {
+    limite: ultimo_dia_mes
+}

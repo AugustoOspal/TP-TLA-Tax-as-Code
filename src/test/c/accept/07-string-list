@@ -1,0 +1,4 @@
+# Prueba de listas con strings
+cliente "Test" {
+    estado_activo: ["Activo", "Inactivo"]
+}

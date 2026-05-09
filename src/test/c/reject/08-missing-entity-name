@@ -1,0 +1,4 @@
+# Las entidades requieren un string identificador
+cliente {
+    atributo: verdadero
+}

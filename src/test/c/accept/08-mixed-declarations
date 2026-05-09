@@ -1,0 +1,12 @@
+# Prueba de combinacion de varias declaraciones
+cliente "Test" {
+    estado_activo: verdadero
+}
+
+regla_facturacion "Test Factura" {
+    - monto mayor o igual a 100
+}
+
+sincronizacion_padrones {
+    fuente: "AFIP"
+}

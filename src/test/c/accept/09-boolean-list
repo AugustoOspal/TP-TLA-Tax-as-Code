@@ -1,0 +1,4 @@
+# Prueba de lista con un solo elemento booleano
+cliente "Test" {
+    estado_activo: [verdadero]
+}

@@ -1,0 +1,4 @@
+# Prueba de lista vacía - Esto no está soportado por la gramática
+cliente "Test" {
+    estado_activo: []
+}
