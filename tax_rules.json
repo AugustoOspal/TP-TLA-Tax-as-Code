@@ -1,0 +1,8 @@
+{
+  "rules": [
+    { "type": "RULE", "name": "Retencion Ganancias - Alquiler", "conditions": [{"type": "relational", "field": "es_monotributista", "op": 2, "value": false}, {"type": "relational", "field": "concepto", "op": 2, "value": "alquileres"}, {"type": "relational", "field": "monto", "op": 1, "value": {"type": "identifier", "value": "TOPE_RETENCION"}}] }
+  ],
+  "constants": [
+    { "type": "CONSTANT", "name": "TOPE_RETENCION", "value": 1000000.000000 }
+  ]
+}

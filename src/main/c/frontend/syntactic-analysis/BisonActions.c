@@ -78,6 +78,17 @@ Declaration * TaskDeclarationSemanticAction(Task * task) {
     return declaration;
 }
 
+Declaration * ConstantDeclarationSemanticAction(char * name, Value * value) {
+    _logSyntacticAnalyzerAction(__FUNCTION__);
+    ConstantDeclaration * constant = calloc(1, sizeof(ConstantDeclaration));
+    constant->name = name;
+    constant->value = value;
+    Declaration * declaration = calloc(1, sizeof(Declaration));
+    declaration->type = CONSTANT_DECLARATION;
+    declaration->constant = constant;
+    return declaration;
+}
+
 Entity * EntitySemanticAction(EntityType type, char * name, Attribute * attributes) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
     Entity * entity = calloc(1, sizeof(Entity));
@@ -136,10 +147,32 @@ Condition * ConditionListSemanticAction(Condition * list, Condition * next) {
 Condition * ConditionSemanticAction(char * field, RelationalOperator op, Value * value) {
 	_logSyntacticAnalyzerAction(__FUNCTION__);
     Condition * condition = calloc(1, sizeof(Condition));
-    condition->field = field;
-    condition->op = op;
-    condition->value = value;
+    condition->type = RELATIONAL_CONDITION;
+    condition->relational.field = field;
+    condition->relational.op = op;
+    condition->relational.value = value;
     return condition;
+}
+
+Condition * RelationalConditionSemanticAction(char * field, RelationalOperator op, Value * value) {
+    return ConditionSemanticAction(field, op, value);
+}
+
+Condition * LogicalConditionSemanticAction(ConditionType type, Condition * left, Condition * right) {
+    _logSyntacticAnalyzerAction(__FUNCTION__);
+    Condition * condition = calloc(1, sizeof(Condition));
+    condition->type = type;
+    condition->logical.left = left;
+    condition->logical.right = right;
+    return condition;
+}
+
+Condition * NotConditionSemanticAction(Condition * condition) {
+    _logSyntacticAnalyzerAction(__FUNCTION__);
+    Condition * not_cond = calloc(1, sizeof(Condition));
+    not_cond->type = NOT_CONDITION;
+    not_cond->not_condition = condition;
+    return not_cond;
 }
 
 Value * StringValueSemanticAction(char * string) {
@@ -198,5 +231,25 @@ Value * ValueListSemanticAction(Value * list, Value * next) {
     }
     current->next = next;
     return list;
+}
+
+Value * ExpressionSemanticAction(ExpressionType op, Value * left, Value * right) {
+    _logSyntacticAnalyzerAction(__FUNCTION__);
+    Expression * expr = calloc(1, sizeof(Expression));
+    expr->op = op;
+    expr->left = left;
+    expr->right = right;
+    Value * value = calloc(1, sizeof(Value));
+    value->type = EXPRESSION_VALUE;
+    value->expression = expr;
+    return value;
+}
+
+Value * IdentifierValueSemanticAction(char * identifier) {
+    _logSyntacticAnalyzerAction(__FUNCTION__);
+    Value * value = calloc(1, sizeof(Value));
+    value->type = IDENTIFIER_VALUE;
+    value->identifier = identifier;
+    return value;
 }
 

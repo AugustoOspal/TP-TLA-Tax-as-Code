@@ -30,8 +30,16 @@ void destroyValue(Value * value) {
                     free(value->string);
                 }
                 break;
+            case IDENTIFIER_VALUE:
+                if (value->identifier != NULL) {
+                    free(value->identifier);
+                }
+                break;
             case LIST_VALUE:
                 destroyValue(value->list);
+                break;
+            case EXPRESSION_VALUE:
+                destroyExpression(value->expression);
                 break;
             default:
                 break;
@@ -68,10 +76,22 @@ void destroyEntity(Entity * entity) {
 void destroyCondition(Condition * condition) {
     logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
     if (condition != NULL) {
-        if (condition->field != NULL) {
-            free(condition->field);
+        switch (condition->type) {
+            case RELATIONAL_CONDITION:
+                if (condition->relational.field != NULL) {
+                    free(condition->relational.field);
+                }
+                destroyValue(condition->relational.value);
+                break;
+            case AND_CONDITION:
+            case OR_CONDITION:
+                destroyCondition(condition->logical.left);
+                destroyCondition(condition->logical.right);
+                break;
+            case NOT_CONDITION:
+                destroyCondition(condition->not_condition);
+                break;
         }
-        destroyValue(condition->value);
         destroyCondition(condition->next);
         free(condition);
     }
@@ -114,6 +134,9 @@ void destroyDeclaration(Declaration * declaration) {
             case TASK_DECLARATION:
                 destroyTask(declaration->task);
                 break;
+            case CONSTANT_DECLARATION:
+                destroyConstantDeclaration(declaration->constant);
+                break;
         }
         destroyDeclaration(declaration->next);
         free(declaration);
@@ -125,6 +148,26 @@ void destroyProgram(Program * program) {
     if (program != NULL) {
         destroyDeclaration(program->declarations);
         free(program);
+    }
+}
+
+void destroyExpression(Expression * expression) {
+    logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
+    if (expression != NULL) {
+        destroyValue(expression->left);
+        destroyValue(expression->right);
+        free(expression);
+    }
+}
+
+void destroyConstantDeclaration(ConstantDeclaration * constant) {
+    logDebugging(_logger, "Executing destructor: %s", __FUNCTION__);
+    if (constant != NULL) {
+        if (constant->name != NULL) {
+            free(constant->name);
+        }
+        destroyValue(constant->value);
+        free(constant);
     }
 }
 

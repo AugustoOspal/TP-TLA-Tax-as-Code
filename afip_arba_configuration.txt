@@ -1,0 +1,10 @@
+==============================================
+ TAX-AS-CODE RULES ENGINE CONFIGURATION       
+==============================================
+
+[CONSTANT] TOPE_RETENCION
+[RULE] Retencion Ganancias - Alquiler
+
+==============================================
+ GENERATED SUCCESSFULLY
+==============================================

@@ -19,8 +19,25 @@ typedef enum ValueType {
     BOOLEAN_VALUE,
     PERCENTAGE_VALUE,
     TIME_VALUE,
-    LIST_VALUE
+    LIST_VALUE,
+    EXPRESSION_VALUE,
+    IDENTIFIER_VALUE
 } ValueType;
+
+typedef enum ExpressionType {
+    ADD,
+    SUB,
+    MUL,
+    DIV
+} ExpressionType;
+
+struct Expression {
+    ExpressionType op;
+    struct Value * left;
+    struct Value * right;
+};
+
+typedef struct Expression Expression;
 
 typedef struct Value {
     ValueType type;
@@ -29,6 +46,8 @@ typedef struct Value {
         double number;
         bool boolean;
         struct Value * list;
+        struct Expression * expression;
+        char * identifier;
     };
     struct Value * next;
 } Value;
@@ -58,10 +77,27 @@ typedef enum RelationalOperator {
     EQ
 } RelationalOperator;
 
+typedef enum ConditionType {
+    RELATIONAL_CONDITION,
+    AND_CONDITION,
+    OR_CONDITION,
+    NOT_CONDITION
+} ConditionType;
+
 typedef struct Condition {
-    char * field;
-    RelationalOperator op;
-    Value * value;
+    ConditionType type;
+    union {
+        struct {
+            char * field;
+            RelationalOperator op;
+            Value * value;
+        } relational;
+        struct {
+            struct Condition * left;
+            struct Condition * right;
+        } logical;
+        struct Condition * not_condition;
+    };
     struct Condition * next;
 } Condition;
 
@@ -90,10 +126,16 @@ typedef struct Task {
     struct Task * next;
 } Task;
 
+typedef struct ConstantDeclaration {
+    char * name;
+    Value * value;
+} ConstantDeclaration;
+
 typedef enum DeclarationType {
     ENTITY_DECLARATION,
     RULE_DECLARATION,
-    TASK_DECLARATION
+    TASK_DECLARATION,
+    CONSTANT_DECLARATION
 } DeclarationType;
 
 typedef struct Declaration {
@@ -102,6 +144,7 @@ typedef struct Declaration {
         Entity * entity;
         Rule * rule;
         Task * task;
+        ConstantDeclaration * constant;
     };
     struct Declaration * next;
 } Declaration;
@@ -123,6 +166,8 @@ void destroyCondition(Condition * condition);
 void destroyRule(Rule * rule);
 void destroyTask(Task * task);
 void destroyDeclaration(Declaration * declaration);
+void destroyExpression(Expression * expression);
+void destroyConstantDeclaration(ConstantDeclaration * constant);
 void destroyProgram(Program * program);
 
 #endif

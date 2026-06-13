@@ -46,6 +46,7 @@ whitespace			[ \t\n\r]+
 "cliente"							{ return TokenLexemeAction(KW_CLIENTE); }
 "proveedor"							{ return TokenLexemeAction(KW_PROVEEDOR); }
 "monotributista"					{ return TokenLexemeAction(KW_MONOTRIBUTISTA); }
+"definir"							{ return TokenLexemeAction(KW_DEFINIR); }
 "regla_facturacion"					{ return TokenLexemeAction(KW_REGLA_FACTURACION); }
 "regla_pago"						{ return TokenLexemeAction(KW_REGLA_PAGO); }
 "regla_exencion"					{ return TokenLexemeAction(KW_REGLA_EXENCION); }
@@ -56,18 +57,28 @@ whitespace			[ \t\n\r]+
 "verdadero"							{ return BooleanLexemeAction(true); }
 "falso"								{ return BooleanLexemeAction(false); }
 
+"y"									{ return TokenLexemeAction(KW_Y); }
+"o"									{ return TokenLexemeAction(KW_O); }
+"no"								{ return TokenLexemeAction(KW_NO); }
+
 "menor"[[:space:]]+"o"[[:space:]]+"igual"[[:space:]]+"a"	{ return TokenLexemeAction(OP_LE); }
 "mayor"[[:space:]]+"o"[[:space:]]+"igual"[[:space:]]+"a"	{ return TokenLexemeAction(OP_GE); }
 "igual"[[:space:]]+"a"				{ return TokenLexemeAction(OP_EQ); }
 
 "{"									{ return TokenLexemeAction(OPEN_BRACE); }
 "}"									{ return TokenLexemeAction(CLOSE_BRACE); }
+"("									{ return TokenLexemeAction(OPEN_PAREN); }
+")"									{ return TokenLexemeAction(CLOSE_PAREN); }
 "["									{ return TokenLexemeAction(OPEN_BRACKET); }
 "]"									{ return TokenLexemeAction(CLOSE_BRACKET); }
-"-"									{ return TokenLexemeAction(BULLET); }
+"-"									{ return TokenLexemeAction(OP_SUB); }
 ":"									{ return TokenLexemeAction(COLON); }
 "%"									{ return TokenLexemeAction(PERCENT); }
 ","									{ return TokenLexemeAction(COMMA); }
+
+"+"									{ return TokenLexemeAction(OP_ADD); }
+"*"									{ return TokenLexemeAction(OP_MUL); }
+"/"									{ return TokenLexemeAction(OP_DIV); }
 
 [[:alpha:]_][[:alnum:]_]*			{ return IdentifierLexemeAction(); }
 [[:digit:]]+(\.[[:digit:]]+)?		{ return NumberLexemeAction(); }
