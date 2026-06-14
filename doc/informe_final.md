@@ -73,3 +73,13 @@ Al procesar la factura, el sistema calcula de forma diferenciada ambas retencion
 
 ## 5. Conclusión
 La separación de responsabilidades demostró ser altamente efectiva. Mediante **Tax-as-Code**, la lógica impositiva volátil queda en manos del sector contable bajo estricto control de versiones (Git), mientras que los sistemas de gestión centralizados se limitan a leer un JSON estándar, garantizando una arquitectura robusta, auditable y libre de fallas críticas en los despliegues.
+
+## 6. Bibliografía y Referencias
+
+**Bibliografía Principal:**
+- Levine, J. R. (2009). *flex & bison: Text Processing Tools*. O'Reilly Media. (Libro fundamental para la construcción del frontend y las estrategias de análisis léxico y sintáctico).
+
+**Referencias Técnicas Adicionales:**
+- Aho, A. V., Lam, M. S., Sethi, R., & Ullman, J. D. (2006). *Compilers: Principles, Techniques, and Tools* (2nd ed.). Pearson Education. (Para conceptos teóricos sobre AST, análisis semántico y resolución de conflictos LALR).
+- GNU Project. (n.d.). *Bison - The Yacc-compatible Parser Generator*. Free Software Foundation. Recuperado de la documentación oficial de GNU.
+- GNU Project. (n.d.). *Flex - The Fast Lexical Analyzer*. Free Software Foundation. Recuperado de la documentación oficial de GNU.
