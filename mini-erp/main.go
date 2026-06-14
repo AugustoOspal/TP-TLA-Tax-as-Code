@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 // Data models
@@ -44,6 +45,7 @@ type Constant struct {
 type PageData struct {
 	Processed          bool
 	Matched            bool
+	NoEmpadronado      bool
 	RuleName           string
 	MontoOriginal      string
 	RetencionGanancias string
@@ -59,17 +61,17 @@ type PageData struct {
 
 type Contribuyente struct {
 	EsMonotributista bool
-	AlicuotaARBA     float64 // e.g. 0.03 for 3% (Prov. Bs. As.)
-	AlicuotaAGIP     float64 // e.g. 0.02 for 2% (CABA)
+	Alicuota         float64
 	CondicionFiscal  string
+	Jurisdiccion     string
 }
 
-// Padrón Tributario Simulado con alícuotas diferenciadas por jurisdicción (ARBA y AGIP)
+// Padrón Tributario Simulado con alícuotas y jurisdicciones (ARBA y AGIP)
 var padronContribuyentes = map[string]Contribuyente{
-	"30000000001": {EsMonotributista: false, AlicuotaARBA: 0.03,  AlicuotaAGIP: 0.02,  CondicionFiscal: "Responsable Inscripto"}, // Inscripto en ambas
-	"20000000002": {EsMonotributista: true,  AlicuotaARBA: 0.00,  AlicuotaAGIP: 0.00,  CondicionFiscal: "Monotributista Exento"},  // Exento en ambas
-	"27000000003": {EsMonotributista: true,  AlicuotaARBA: 0.015, AlicuotaAGIP: 0.00,  CondicionFiscal: "Monotributista Activo"},  // Solo ARBA
-	"33000000004": {EsMonotributista: false, AlicuotaARBA: 0.00,  AlicuotaAGIP: 0.03,  CondicionFiscal: "Responsable Inscripto"}, // Solo AGIP
+	"30000000001": {EsMonotributista: false, Alicuota: 0.03,  CondicionFiscal: "Responsable Inscripto", Jurisdiccion: "ARBA"},
+	"20000000002": {EsMonotributista: true,  Alicuota: 0.00,  CondicionFiscal: "Monotributista Exento", Jurisdiccion: "AGIP"},
+	"27000000003": {EsMonotributista: true,  Alicuota: 0.015, CondicionFiscal: "Monotributista Activo", Jurisdiccion: "ARBA"},
+	"33000000004": {EsMonotributista: false, Alicuota: 0.02,  CondicionFiscal: "Responsable Inscripto", Jurisdiccion: "AGIP"},
 }
 
 func main() {
@@ -97,57 +99,46 @@ func handleProcesar(w http.ResponseWriter, r *http.Request) {
 	}
 
 	r.ParseForm()
-	cuit := r.FormValue("cuit")
+	cuitRaw := r.FormValue("cuit")
+	cuit := strings.ReplaceAll(strings.TrimSpace(cuitRaw), "-", "")
 	monto, _ := strconv.ParseFloat(r.FormValue("monto"), 64)
-	jurisdiccion := r.FormValue("jurisdiccion") // "ARBA" o "AGIP"
 
 	// Consulta automática al padrón por CUIT
 	contribuyente, exists := padronContribuyentes[cuit]
+	
+	if !exists {
+		data := PageData{
+			Processed:     true,
+			NoEmpadronado: true,
+			CUIT:          cuitRaw,
+		}
+		renderTemplate(w, data)
+		return
+	}
+
 	metodo := "Padrón Tributario Unificado (Simulado)"
 	
 	var alicuotaIIBB float64
 	var nomJurisdiccion string
 	var nomEnte string
+	var jurisdiccion string
 
+	jurisdiccion = contribuyente.Jurisdiccion
 	if jurisdiccion == "AGIP" {
-		nomJurisdiccion = "Ciudad Autónoma de Buenos Aires"
-		nomEnte = "AGIP"
-	} else {
-		nomJurisdiccion = "Provincia de Buenos Aires"
-		nomEnte = "ARBA"
-		jurisdiccion = "ARBA"
-	}
+			nomJurisdiccion = "Ciudad Autónoma de Buenos Aires"
+			nomEnte = "AGIP"
+		} else {
+			nomJurisdiccion = "Provincia de Buenos Aires"
+			nomEnte = "ARBA"
+		}
 
-	if !exists {
-		// Alícuota penal alta para no registrados
-		var tasaPenal float64
-		if jurisdiccion == "AGIP" {
-			tasaPenal = 0.045 // 4.5% AGIP penal
-		} else {
-			tasaPenal = 0.04  // 4.0% ARBA penal
-		}
-		contribuyente = Contribuyente{
-			EsMonotributista: false,
-			AlicuotaARBA:     tasaPenal,
-			AlicuotaAGIP:     tasaPenal,
-			CondicionFiscal:  "No Empadronado",
-		}
-		alicuotaIIBB = tasaPenal
-		metodo = fmt.Sprintf("No encontrado en Padrón (Se aplica alícuota penal del %.1f%% para %s)", tasaPenal*100, nomEnte)
-	} else {
-		if jurisdiccion == "AGIP" {
-			alicuotaIIBB = contribuyente.AlicuotaAGIP
-		} else {
-			alicuotaIIBB = contribuyente.AlicuotaARBA
-		}
+		alicuotaIIBB = contribuyente.Alicuota
 		
 		if alicuotaIIBB == 0 {
 			metodo = fmt.Sprintf("CUIT exento o no registrado en jurisdicción %s", nomEnte)
 		} else {
 			metodo = fmt.Sprintf("Alícuota resuelta desde el padrón de %s", nomEnte)
 		}
-	}
-
 	factura := Factura{
 		CUIT:             cuit,
 		Monto:            monto,

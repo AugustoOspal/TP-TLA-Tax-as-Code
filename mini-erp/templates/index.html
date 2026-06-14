@@ -209,10 +209,11 @@
                     <input type="text" id="cuit" name="cuit" value="30000000001" required>
                     <p style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.4rem; line-height: 1.45;">
                         Ejemplos:<br>
-                        • CUIT <code style="color: #60a5fa; cursor: pointer;" onclick="document.getElementById('cuit').value='30000000001'">30000000001</code> (RI: ARBA 3.0% | AGIP 2.0%)<br>
-                        • CUIT <code style="color: #a78bfa; cursor: pointer;" onclick="document.getElementById('cuit').value='20000000002'">20000000002</code> (Monotr. Exento)<br>
-                        • CUIT <code style="color: #a78bfa; cursor: pointer;" onclick="document.getElementById('cuit').value='27000000003'">27000000003</code> (Monotr. Activo: ARBA 1.5% | AGIP Exento)<br>
-                        • CUIT <code style="color: #cbd5e1; cursor: pointer;" onclick="document.getElementById('cuit').value='99999999999'">99999999999</code> (No registrado: ARBA 4.0% | AGIP 4.5% penal)
+                        • CUIT <code style="color: #60a5fa; cursor: pointer;" onclick="document.getElementById('cuit').value='30000000001'">30000000001</code> (RI: ARBA 3.0%)<br>
+                        • CUIT <code style="color: #a78bfa; cursor: pointer;" onclick="document.getElementById('cuit').value='20000000002'">20000000002</code> (Monotr. Exento: AGIP)<br>
+                        • CUIT <code style="color: #a78bfa; cursor: pointer;" onclick="document.getElementById('cuit').value='27000000003'">27000000003</code> (Monotr. Activo: ARBA 1.5%)<br>
+                        • CUIT <code style="color: #cbd5e1; cursor: pointer;" onclick="document.getElementById('cuit').value='33000000004'">33000000004</code> (RI: AGIP 2.0%)<br>
+                        • CUIT <code style="color: #cbd5e1; cursor: pointer;" onclick="document.getElementById('cuit').value='99999999999'">99999999999</code> (No registrado: Penal ARBA 4.0%)
                     </p>
                 </div>
 
@@ -226,14 +227,6 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="jurisdiccion">Jurisdicción de la Operación</label>
-                    <select id="jurisdiccion" name="jurisdiccion">
-                        <option value="ARBA" selected>Provincia de Buenos Aires (ARBA)</option>
-                        <option value="AGIP">CABA (AGIP)</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
                     <label for="monto">Monto Bruto ($)</label>
                     <input type="number" id="monto" name="monto" step="0.01" value="36000000.00" required>
                 </div>
@@ -242,7 +235,13 @@
             </form>
 
             {{if .Processed}}
-                <div class="taxpayer-status" style="margin-top: 1.5rem; padding: 1rem; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 8px; font-size: 0.85rem;">
+                {{if .NoEmpadronado}}
+                    <div class="no-match" style="border-color: #f87171; background: rgba(248, 113, 113, 0.1);">
+                        <p style="color: #f87171; font-weight: 600;">CUIT {{.CUIT}} no se encuentra empadronado.</p>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem; color: var(--text-muted);">No es posible realizar la liquidación de impuestos ni emitir certificados para contribuyentes que no existen en el padrón tributario.</p>
+                    </div>
+                {{else}}
+                    <div class="taxpayer-status" style="margin-top: 1.5rem; padding: 1rem; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 8px; font-size: 0.85rem;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
                         <span style="color: var(--text-muted);">CUIT Consultado:</span>
                         <span style="font-weight: 600;">{{.CUIT}}</span>
@@ -299,6 +298,7 @@
                     <p>La factura fue procesada con éxito.</p>
                     <p style="font-size: 0.85rem; margin-top: 0.5rem;">No se activó ninguna retención de Ganancias ni de Ingresos Brutos para los datos ingresados.</p>
                 </div>
+                {{end}}
                 {{end}}
             {{end}}
         </div>

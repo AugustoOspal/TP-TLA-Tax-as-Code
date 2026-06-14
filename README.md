@@ -57,6 +57,16 @@ src/main/bash/run.sh <program>
 
 where `<program>` is the path to the file that represents its entry-point.
 
+### Mini-ERP (Web Application)
+
+To start both the compiler environment and the Mini-ERP web interface simultaneously using Docker:
+
+```bash
+docker compose up -d --build
+```
+
+Once the containers are running, you can access the web application at [http://localhost:8080](http://localhost:8080).
+
 ### Test
 
 Executes every available unit-test under `src/test/c` folder:
