@@ -25,6 +25,7 @@ ModuleDestructor initializeGeneratorModule() {
 
 static void _generateProgram(Program * program);
 static void _generateTxt(Program * program);
+static void _generateCsv(Program * program);
 static void _generateJson(Program * program);
 static void _generateValueJson(FILE * f, Value * value);
 static void _generateConditionJson(FILE * f, Condition * condition);
@@ -52,29 +53,52 @@ static void _generateTxt(Program * program) {
         logError(_logger, "Could not open afip_arba_configuration.txt for writing.");
         return;
     }
-    fprintf(f, "==============================================\n");
-    fprintf(f, " TAX-AS-CODE RULES ENGINE CONFIGURATION       \n");
-    fprintf(f, "==============================================\n\n");
 
     Declaration* current = program->declarations;
     while (current != NULL) {
         if (current->type == CONSTANT_DECLARATION) {
-            fprintf(f, "[CONSTANT] %s\n", current->constant->name);
-        } else if (current->type == ENTITY_DECLARATION) {
-            fprintf(f, "[ENTITY] %s\n", current->entity->name);
+            fprintf(f, "%-10.10s%-40.40s%-20.20s\n", "CONSTANTE", current->constant->name, "ACTIVO");
         } else if (current->type == RULE_DECLARATION) {
-            fprintf(f, "[RULE] %s\n", current->rule->name);
-        } else if (current->type == TASK_DECLARATION) {
-            fprintf(f, "[TASK] %s\n", current->task->name);
+            fprintf(f, "%-10.10s%-40.40s%-20.20s\n", "REGLA", current->rule->name, "VIGENTE");
         }
         current = current->next;
     }
 
-    fprintf(f, "\n==============================================\n");
-    fprintf(f, " GENERATED SUCCESSFULLY\n");
-    fprintf(f, "==============================================\n");
     fclose(f);
     logDebugging(_logger, "TXT generation complete.");
+}
+
+static void _generateCsv(Program * program) {
+    FILE * f = fopen("audit_matrix.csv", "w");
+    if (!f) {
+        logError(_logger, "Could not open audit_matrix.csv for writing.");
+        return;
+    }
+    fprintf(f, "Tipo,Nombre_Regla_o_Constante,Atributo_o_Condicion,Operador,Valor_Esperado\n");
+    Declaration* current = program->declarations;
+    while (current != NULL) {
+        if (current->type == CONSTANT_DECLARATION) {
+            fprintf(f, "Constante,%s,-,-,", current->constant->name);
+            _generateValueJson(f, current->constant->value);
+            fprintf(f, "\n");
+        } else if (current->type == RULE_DECLARATION) {
+            Condition * cond = current->rule->conditions;
+            while(cond) {
+                fprintf(f, "Regla,%s,", current->rule->name);
+                if (cond->type == RELATIONAL_CONDITION) {
+                    fprintf(f, "%s,%d,", cond->relational.field, cond->relational.op);
+                    _generateValueJson(f, cond->relational.value);
+                } else {
+                    fprintf(f, "Condicion_Logica,-,-");
+                }
+                fprintf(f, "\n");
+                cond = cond->next;
+            }
+        }
+        current = current->next;
+    }
+    fclose(f);
+    logDebugging(_logger, "CSV generation complete.");
 }
 
 static void _generateValueJson(FILE * f, Value * value) {
@@ -205,6 +229,9 @@ static void _generateProgram(Program * program) {
     
     logDebugging(_logger, "Generating TXT...");
     _generateTxt(program);
+
+    logDebugging(_logger, "Generating CSV...");
+    _generateCsv(program);
 
     logDebugging(_logger, "Generating JSON...");
     _generateJson(program);

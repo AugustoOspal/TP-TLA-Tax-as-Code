@@ -1,0 +1,13 @@
+Tipo,Nombre_Regla_o_Constante,Atributo_o_Condicion,Operador,Valor_Esperado
+Constante,TOPE_RETENCION,-,-,1000000.000000
+Constante,FACTURACION_MINIMA,-,-,{"type": "expression", "op": 0, "left": 500000.000000, "right": 200000.000000}
+Constante,SCORE_CRITICO,-,-,{"type": "expression", "op": 2, "left": 50.000000, "right": 2.000000}
+Constante,TASA_GENERAL,-,-,6.000000
+Regla,Retencion Ganancias - Alquiler,es_monotributista,2,false
+Regla,Retencion Ganancias - Alquiler,concepto,2,"alquileres"
+Regla,Retencion Ganancias - Alquiler,monto,1,{"type": "identifier", "value": "TOPE_RETENCION"}
+Regla,Alerta Control Fiscal,es_monotributista,2,true
+Regla,Alerta Control Fiscal,monto,1,{"type": "identifier", "value": "FACTURACION_MINIMA"}
+Regla,Alerta Control Fiscal,score,1,{"type": "identifier", "value": "SCORE_CRITICO"}
+Regla,Exencion PyME,es_pyme,2,true
+Regla,Exencion PyME,monto,0,{"type": "expression", "op": 2, "left": {"type": "identifier", "value": "TOPE_RETENCION"}, "right": 2.500000}

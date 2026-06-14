@@ -31,9 +31,10 @@ Un módulo especializado (`SemanticAnalyzer.c`) recorre el AST verificando la co
 - **Chequeo de Tipos:** Asegura que no se comparen variables booleanas con cadenas de texto o números.
 
 ### 2.5. Generación de Código (Backend)
-En lugar de generar código ensamblador, el compilador exporta la lógica de negocio a formatos universales:
-- **TXT Legible:** Un reporte `afip_arba_configuration.txt` para auditoría humana.
-- **JSON Estructurado:** Un archivo `tax_rules.json` que desglosa matemáticamente las reglas y condiciones, listo para ser consumido por cualquier sistema externo.
+En línea con las especificaciones del proyecto (Stage 3), el compilador exporta la lógica de negocio a los formatos requeridos:
+- **Archivos Planos (.txt) Normativos:** Archivo `afip_arba_configuration.txt` exportado en formato posicional de longitud fija para la potencial importación en aplicativos (SICORE, SIAp).
+- **Planilla de Auditoría (.csv):** Archivo `audit_matrix.csv` con formato tabular para la conciliación de reglas y atributos por parte de los contadores, donde pueden filtrar y visualizar operaciones.
+- **JSON Estructurado (Extra):** Un archivo `tax_rules.json` que desglosa matemáticamente las reglas y condiciones, listo para ser consumido por cualquier sistema externo.
 
 ## 3. Casos de Uso y Aplicación
 Para validar la utilidad del DSL, se implementaron reglas que atacan problemas comunes en la contabilidad argentina:

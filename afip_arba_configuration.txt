@@ -1,15 +1,7 @@
-==============================================
- TAX-AS-CODE RULES ENGINE CONFIGURATION       
-==============================================
-
-[CONSTANT] TOPE_RETENCION
-[CONSTANT] FACTURACION_MINIMA
-[CONSTANT] SCORE_CRITICO
-[CONSTANT] TASA_GENERAL
-[RULE] Retencion Ganancias - Alquiler
-[RULE] Alerta Control Fiscal
-[RULE] Exencion PyME
-
-==============================================
- GENERATED SUCCESSFULLY
-==============================================
+CONSTANTE TOPE_RETENCION                          ACTIVO              
+CONSTANTE FACTURACION_MINIMA                      ACTIVO              
+CONSTANTE SCORE_CRITICO                           ACTIVO              
+CONSTANTE TASA_GENERAL                            ACTIVO              
+REGLA     Retencion Ganancias - Alquiler          VIGENTE             
+REGLA     Alerta Control Fiscal                   VIGENTE             
+REGLA     Exencion PyME                           VIGENTE             
