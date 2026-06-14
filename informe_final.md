@@ -64,7 +64,7 @@ Este sistema está completamente **contenedorizado utilizando Docker** y corre d
 
 El sistema liquida impuestos bajo dos esquemas independientes y complementarios:
 1. **Retención de Ganancias:** Evaluación dinámica mediante el compilador de las condiciones declaradas en el archivo `.tac` (eximiendo monotributistas y aplicando alícuotas del 6.00% sobre conceptos como alquileres).
-2. **Retención de Ingresos Brutos (IIBB):** Consulta en tiempo real de un padrón provincial simulado (ARBA) que asigna alícuotas según el CUIT (con tasas del 0% para exentos, del 1.5% al 3% para activos, y una tasa penal del 4.0% para CUITs no empadronados).
+2. **Retención de Ingresos Brutos (IIBB):** Consulta en tiempo real de un padrón tributario simulado que discrimina por jurisdicción (ARBA para Provincia de Buenos Aires y AGIP para CABA), asignando alícuotas según el CUIT y la región (con tasas del 0% para exentos, del 1.5% al 3% para activos, y tasas penales del 4.0% para ARBA y 4.5% para AGIP en CUITs no empadronados).
 
 Al procesar la factura, el sistema calcula de forma diferenciada ambas retenciones, liquida el importe neto a pagar y emite certificados oficiales separados y transparentes para cada tributo.
 
