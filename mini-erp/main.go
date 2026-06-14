@@ -42,13 +42,34 @@ type Constant struct {
 
 // Template data
 type PageData struct {
-	Processed     bool
-	Matched       bool
-	RuleName      string
-	MontoOriginal string
-	Retencion     string
-	Neto          string
-	Certificado   string
+	Processed          bool
+	Matched            bool
+	RuleName           string
+	MontoOriginal      string
+	RetencionGanancias string
+	RetencionIIBB      string
+	TotalRetenido      string
+	Neto               string
+	Certificado        string
+	CUIT               string
+	CondicionFiscal    string
+	AlicuotaIIBB       string
+	MetodoResolucion   string
+}
+
+type Contribuyente struct {
+	EsMonotributista bool
+	AlicuotaARBA     float64 // e.g. 0.03 for 3% (Prov. Bs. As.)
+	AlicuotaAGIP     float64 // e.g. 0.02 for 2% (CABA)
+	CondicionFiscal  string
+}
+
+// Padrón Tributario Simulado con alícuotas diferenciadas por jurisdicción (ARBA y AGIP)
+var padronContribuyentes = map[string]Contribuyente{
+	"30000000001": {EsMonotributista: false, AlicuotaARBA: 0.03,  AlicuotaAGIP: 0.02,  CondicionFiscal: "Responsable Inscripto"}, // Inscripto en ambas
+	"20000000002": {EsMonotributista: true,  AlicuotaARBA: 0.00,  AlicuotaAGIP: 0.00,  CondicionFiscal: "Monotributista Exento"},  // Exento en ambas
+	"27000000003": {EsMonotributista: true,  AlicuotaARBA: 0.015, AlicuotaAGIP: 0.00,  CondicionFiscal: "Monotributista Activo"},  // Solo ARBA
+	"33000000004": {EsMonotributista: false, AlicuotaARBA: 0.00,  AlicuotaAGIP: 0.03,  CondicionFiscal: "Responsable Inscripto"}, // Solo AGIP
 }
 
 func main() {
@@ -76,14 +97,62 @@ func handleProcesar(w http.ResponseWriter, r *http.Request) {
 	}
 
 	r.ParseForm()
+	cuit := r.FormValue("cuit")
 	monto, _ := strconv.ParseFloat(r.FormValue("monto"), 64)
-	esMono := r.FormValue("monotributista") == "on"
+	jurisdiccion := r.FormValue("jurisdiccion") // "ARBA" o "AGIP"
+
+	// Consulta automática al padrón por CUIT
+	contribuyente, exists := padronContribuyentes[cuit]
+	metodo := "Padrón Tributario Unificado (Simulado)"
+	
+	var alicuotaIIBB float64
+	var nomJurisdiccion string
+	var nomEnte string
+
+	if jurisdiccion == "AGIP" {
+		nomJurisdiccion = "Ciudad Autónoma de Buenos Aires"
+		nomEnte = "AGIP"
+	} else {
+		nomJurisdiccion = "Provincia de Buenos Aires"
+		nomEnte = "ARBA"
+		jurisdiccion = "ARBA"
+	}
+
+	if !exists {
+		// Alícuota penal alta para no registrados
+		var tasaPenal float64
+		if jurisdiccion == "AGIP" {
+			tasaPenal = 0.045 // 4.5% AGIP penal
+		} else {
+			tasaPenal = 0.04  // 4.0% ARBA penal
+		}
+		contribuyente = Contribuyente{
+			EsMonotributista: false,
+			AlicuotaARBA:     tasaPenal,
+			AlicuotaAGIP:     tasaPenal,
+			CondicionFiscal:  "No Empadronado",
+		}
+		alicuotaIIBB = tasaPenal
+		metodo = fmt.Sprintf("No encontrado en Padrón (Se aplica alícuota penal del %.1f%% para %s)", tasaPenal*100, nomEnte)
+	} else {
+		if jurisdiccion == "AGIP" {
+			alicuotaIIBB = contribuyente.AlicuotaAGIP
+		} else {
+			alicuotaIIBB = contribuyente.AlicuotaARBA
+		}
+		
+		if alicuotaIIBB == 0 {
+			metodo = fmt.Sprintf("CUIT exento o no registrado en jurisdicción %s", nomEnte)
+		} else {
+			metodo = fmt.Sprintf("Alícuota resuelta desde el padrón de %s", nomEnte)
+		}
+	}
 
 	factura := Factura{
-		CUIT:             r.FormValue("cuit"),
+		CUIT:             cuit,
 		Monto:            monto,
 		Concepto:         r.FormValue("concepto"),
-		EsMonotributista: esMono,
+		EsMonotributista: contribuyente.EsMonotributista,
 	}
 
 	// Read Rules dynamically
@@ -101,9 +170,18 @@ func handleProcesar(w http.ResponseWriter, r *http.Request) {
 		constants[c.Name] = c.Value
 	}
 
-	data := PageData{Processed: true, Matched: false}
+	data := PageData{
+		Processed:        true,
+		CUIT:             cuit,
+		CondicionFiscal:  contribuyente.CondicionFiscal,
+		AlicuotaIIBB:     fmt.Sprintf("%.2f%% (%s)", alicuotaIIBB*100, nomEnte),
+		MetodoResolucion: metodo,
+	}
 
-	// Evaluate
+	// 1. Evaluar Retención de Ganancias según el DSL Compilado (tax_rules.json)
+	retencionGanancias := 0.0
+	ruleName := "Ninguna"
+	
 	for _, rule := range taxRules.Rules {
 		matched := true
 		for _, cond := range rule.Conditions {
@@ -114,26 +192,45 @@ func handleProcesar(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if matched {
-			data.Matched = true
-			data.RuleName = rule.Name
-
+			ruleName = rule.Name
 			if rule.Name == "Retencion Ganancias - Alquiler" {
-				retencion := factura.Monto * 0.06
-				neto := factura.Monto - retencion
-
-				data.MontoOriginal = fmt.Sprintf("%.2f", factura.Monto)
-				data.Retencion = fmt.Sprintf("%.2f", retencion)
-				data.Neto = fmt.Sprintf("%.2f", neto)
-				
-				cert := fmt.Sprintf("CERTIFICADO DE RETENCION\n------------------------\nAgente: Mini ERP\nSujeto: %s\nBase Imponible: $%.2f\nRetenido: $%.2f", factura.CUIT, factura.Monto, retencion)
-				data.Certificado = cert
+				retencionGanancias = factura.Monto * 0.06 // 6% Ganancias
 			}
 			break
 		}
 	}
 
+	// 2. Evaluar Retención de Ingresos Brutos (IIBB) según la alícuota del padrón de la jurisdicción seleccionada
+	retencionIIBB := 0.0
+	if alicuotaIIBB > 0 {
+		retencionIIBB = factura.Monto * alicuotaIIBB
+	}
+
+	totalRetenido := retencionGanancias + retencionIIBB
+	neto := factura.Monto - totalRetenido
+
+	data.Matched = (totalRetenido > 0)
+	data.RuleName = ruleName
+	data.MontoOriginal = fmt.Sprintf("%.2f", factura.Monto)
+	data.RetencionGanancias = fmt.Sprintf("%.2f", retencionGanancias)
+	data.RetencionIIBB = fmt.Sprintf("%.2f", retencionIIBB)
+	data.TotalRetenido = fmt.Sprintf("%.2f", totalRetenido)
+	data.Neto = fmt.Sprintf("%.2f", neto)
+
+	// Construir certificados diferenciados
+	certText := ""
+	if retencionGanancias > 0 {
+		certText += fmt.Sprintf("CERTIFICADO DE RETENCION DE GANANCIAS\n---------------------------------------\nAgente de Retención: Mini ERP\nSujeto Retenido: %s (%s)\nConcepto: %s\nBase Imponible: $%.2f\nAlícuota Aplicada: 6.00%%\nMonto Retenido: $%.2f\n\n", cuit, contribuyente.CondicionFiscal, ruleName, factura.Monto, retencionGanancias)
+	}
+	
+	if retencionIIBB > 0 {
+		certText += fmt.Sprintf("CERTIFICADO DE RETENCION DE INGRESOS BRUTOS\n--------------------------------------------\nAgente de Retención: Mini ERP\nSujeto Retenido: %s (%s)\nJurisdicción: %s (%s)\nBase Imponible: $%.2f\nAlícuota de Padrón: %.2f%%\nMonto Retenido: $%.2f\n", cuit, contribuyente.CondicionFiscal, nomJurisdiccion, nomEnte, factura.Monto, alicuotaIIBB*100, retencionIIBB)
+	}
+	
+	data.Certificado = certText
 	renderTemplate(w, data)
 }
+
 
 func renderTemplate(w http.ResponseWriter, data PageData) {
 	tmpl, err := template.ParseFiles("templates/index.html")

@@ -3,7 +3,12 @@
 ==============================================
 
 [CONSTANT] TOPE_RETENCION
+[CONSTANT] FACTURACION_MINIMA
+[CONSTANT] SCORE_CRITICO
+[CONSTANT] TASA_GENERAL
 [RULE] Retencion Ganancias - Alquiler
+[RULE] Alerta Control Fiscal
+[RULE] Exencion PyME
 
 ==============================================
  GENERATED SUCCESSFULLY

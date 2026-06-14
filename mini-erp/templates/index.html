@@ -207,6 +207,13 @@
                 <div class="form-group">
                     <label for="cuit">CUIT del Proveedor</label>
                     <input type="text" id="cuit" name="cuit" value="30000000001" required>
+                    <p style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.4rem; line-height: 1.45;">
+                        Ejemplos:<br>
+                        • CUIT <code style="color: #60a5fa; cursor: pointer;" onclick="document.getElementById('cuit').value='30000000001'">30000000001</code> (RI: ARBA 3.0% | AGIP 2.0%)<br>
+                        • CUIT <code style="color: #a78bfa; cursor: pointer;" onclick="document.getElementById('cuit').value='20000000002'">20000000002</code> (Monotr. Exento)<br>
+                        • CUIT <code style="color: #a78bfa; cursor: pointer;" onclick="document.getElementById('cuit').value='27000000003'">27000000003</code> (Monotr. Activo: ARBA 1.5% | AGIP Exento)<br>
+                        • CUIT <code style="color: #cbd5e1; cursor: pointer;" onclick="document.getElementById('cuit').value='99999999999'">99999999999</code> (No registrado: ARBA 4.0% | AGIP 4.5% penal)
+                    </p>
                 </div>
 
                 <div class="form-group">
@@ -219,36 +226,67 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="monto">Monto Bruto ($)</label>
-                    <input type="number" id="monto" name="monto" step="0.01" value="36000000.00" required>
+                    <label for="jurisdiccion">Jurisdicción de la Operación</label>
+                    <select id="jurisdiccion" name="jurisdiccion">
+                        <option value="ARBA" selected>Provincia de Buenos Aires (ARBA)</option>
+                        <option value="AGIP">CABA (AGIP)</option>
+                    </select>
                 </div>
 
-                <div class="form-group checkbox-group">
-                    <input type="checkbox" id="monotributista" name="monotributista">
-                    <label for="monotributista" style="margin:0;">Es Monotributista</label>
+                <div class="form-group">
+                    <label for="monto">Monto Bruto ($)</label>
+                    <input type="number" id="monto" name="monto" step="0.01" value="36000000.00" required>
                 </div>
 
                 <button type="submit">Procesar Factura</button>
             </form>
 
             {{if .Processed}}
+                <div class="taxpayer-status" style="margin-top: 1.5rem; padding: 1rem; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 8px; font-size: 0.85rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+                        <span style="color: var(--text-muted);">CUIT Consultado:</span>
+                        <span style="font-weight: 600;">{{.CUIT}}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
+                        <span style="color: var(--text-muted);">Condición Fiscal:</span>
+                        <span style="font-weight: 600; color: #60a5fa;">{{.CondicionFiscal}}</span>
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); text-align: right; margin-top: 0.4rem; font-style: italic;">
+                        Fuente: {{.MetodoResolucion}}
+                    </div>
+                </div>
+
                 {{if .Matched}}
                 <div class="result-panel">
                     <h3 class="result-title">
                         <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        Regla Disparada: {{.RuleName}}
+                        Liquidación de Impuestos
                     </h3>
+
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem;">
+                        Regla de Ganancias Activa: <strong style="color: #e2e8f0;">{{.RuleName}}</strong>
+                    </div>
                     
                     <div class="result-row">
-                        <span>Monto Original:</span>
+                        <span>Monto Original de Factura:</span>
                         <span>${{.MontoOriginal}}</span>
                     </div>
                     <div class="result-row" style="color: #f87171;">
-                        <span>Retención (6%):</span>
-                        <span>- ${{.Retencion}}</span>
+                        <span>Retención de Ganancias (6%):</span>
+                        <span>- ${{.RetencionGanancias}}</span>
                     </div>
+                    <div class="result-row" style="color: #fb923c;">
+                        <span>Retención Ingresos Brutos ({{.AlicuotaIIBB}}):</span>
+                        <span>- ${{.RetencionIIBB}}</span>
+                    </div>
+                    
+                    <div class="result-row total" style="border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 0.5rem; margin-top: 0.5rem; color: #f87171;">
+                        <span>Total Retenido:</span>
+                        <span>- ${{.TotalRetenido}}</span>
+                    </div>
+
                     <div class="result-row total">
-                        <span>Neto a Pagar:</span>
+                        <span>Neto a Liquidar (Neto a Pagar):</span>
                         <span>${{.Neto}}</span>
                     </div>
 
@@ -259,7 +297,7 @@
                 {{else}}
                 <div class="no-match">
                     <p>La factura fue procesada con éxito.</p>
-                    <p style="font-size: 0.85rem; margin-top: 0.5rem;">No se activó ninguna regla de retención para los datos ingresados.</p>
+                    <p style="font-size: 0.85rem; margin-top: 0.5rem;">No se activó ninguna retención de Ganancias ni de Ingresos Brutos para los datos ingresados.</p>
                 </div>
                 {{end}}
             {{end}}

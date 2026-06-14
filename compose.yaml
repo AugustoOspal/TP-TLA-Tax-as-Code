@@ -41,3 +41,19 @@ services:
     volumes:
       - ".:/home/ubuntu/Flex-Bison-Compiler"
     working_dir: "/home/ubuntu/Flex-Bison-Compiler"
+
+  mini-erp:
+    build:
+      context: "."
+      dockerfile: "mini-erp/Dockerfile"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ".:/app"
+    working_dir: "/app/mini-erp"
+    command: "go run main.go"
+    networks:
+      ar-edu-itba-atlyc:
+        aliases:
+          - "minierp.atlyc.itba.edu.ar"
+

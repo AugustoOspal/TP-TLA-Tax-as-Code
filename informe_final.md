@@ -58,10 +58,17 @@ regla_pago "Retencion Ganancias - Alquiler" {
 ```
 
 ## 4. Integración Externa: El Motor Transaccional (Mini ERP)
-Para demostrar la omnipotencia del archivo JSON generado, se construyó un ecosistema satélite: un **Mini ERP desarrollado en Golang**. 
+Para demostrar la versatilidad del archivo JSON generado, se construyó un ecosistema satélite: un **Mini ERP desarrollado en Golang**. 
 
-Este sistema actúa como un servidor web (levantado en `localhost:8080`) independiente del compilador. Su función es recibir facturas entrantes, cargar en vivo el archivo `tax_rules.json` y evaluar las condiciones matemáticamente. 
-Si el motor detecta que una factura dispara una regla (por ejemplo, el pago de un alquiler de $36.000.000 a un Responsable Inscripto), el ERP calcula automáticamente el descuento, genera una "Orden de Pago" neta y emite un "Certificado de Retención" para el proveedor.
+Este sistema está completamente **contenedorizado utilizando Docker** y corre de forma independiente del compilador. Se integra en el mismo archivo `compose.yaml` bajo el servicio `mini-erp`, exponiendo la interfaz en el puerto `8080`. Su función es recibir facturas entrantes, cargar en vivo el archivo `tax_rules.json` (gracias a un volumen compartido de Docker) y evaluar las condiciones fiscalmente. 
+
+El sistema liquida impuestos bajo dos esquemas independientes y complementarios:
+1. **Retención de Ganancias:** Evaluación dinámica mediante el compilador de las condiciones declaradas en el archivo `.tac` (eximiendo monotributistas y aplicando alícuotas del 6.00% sobre conceptos como alquileres).
+2. **Retención de Ingresos Brutos (IIBB):** Consulta en tiempo real de un padrón provincial simulado (ARBA) que asigna alícuotas según el CUIT (con tasas del 0% para exentos, del 1.5% al 3% para activos, y una tasa penal del 4.0% para CUITs no empadronados).
+
+Al procesar la factura, el sistema calcula de forma diferenciada ambas retenciones, liquida el importe neto a pagar y emite certificados oficiales separados y transparentes para cada tributo.
+
+
 
 ## 5. Conclusión
 La separación de responsabilidades demostró ser altamente efectiva. Mediante **Tax-as-Code**, la lógica impositiva volátil queda en manos del sector contable bajo estricto control de versiones (Git), mientras que los sistemas de gestión centralizados se limitan a leer un JSON estándar, garantizando una arquitectura robusta, auditable y libre de fallas críticas en los despliegues.
