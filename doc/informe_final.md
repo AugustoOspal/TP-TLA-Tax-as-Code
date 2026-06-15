@@ -1,6 +1,12 @@
 # Trabajo Práctico: Tax-as-Code
 **Materia:** Teoría de Lenguajes y Autómatas (TLA)  
-**Autor:** Augusto Ospal  
+# Equipo G-124
+
+| Nombre | Apellido | Legajo | E-mail |
+| :---: | :---: | :---: | :---: |
+| Santiago | Cibeira | 64560 | **scibeira@itba.edu.ar** |
+| Manuel | Suñol | 64138 | **msunol[@itba.edu.ar](mailto:luke@itba.edu.ar)** |
+| Augusto | Ospal | 63669 | **aospalmadeo@itba.edu.ar** |
 
 ---
 
