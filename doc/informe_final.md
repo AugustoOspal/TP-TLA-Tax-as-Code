@@ -120,7 +120,7 @@ Este sistema está completamente **contenedorizado utilizando Docker** y corre d
 
 El sistema liquida impuestos bajo dos esquemas independientes y complementarios:
 1. **Retención de Ganancias:** Evaluación dinámica de las condiciones declaradas en el archivo `.tac` compilado (eximiendo automáticamente a monotributistas y aplicando alícuotas del 6.00% sobre conceptos como alquileres).
-2. **Retención de Ingresos Brutos (IIBB):** Consulta en tiempo real de un padrón tributario simulado que discrimina por jurisdicción. El padrón almacena tanto la alícuota como la jurisdicción correspondiente a cada CUIT (ARBA para Provincia de Buenos Aires, AGIP para CABA). Si un CUIT no se encuentra empadronado, el sistema bloquea la operación y notifica que no es posible liquidar impuestos para contribuyentes inexistentes en el padrón.
+2. **Retención de Ingresos Brutos (IIBB):** Consulta a un padrón tributario simulado, implementado como un mapa de CUITs hardcodeados en el código Go. Cada entrada del padrón almacena la condición fiscal, la alícuota y la jurisdicción correspondiente al CUIT (ARBA para Provincia de Buenos Aires, AGIP para CABA). Si un CUIT no se encuentra en el padrón, el sistema bloquea la operación e informa que no es posible liquidar impuestos para contribuyentes no empadronados. En un entorno productivo, este mapa sería reemplazado por consultas a los Web Services reales de ARBA y AGIP.
 
 Al procesar una factura de un contribuyente empadronado, el sistema calcula ambas retenciones de forma diferenciada, liquida el importe neto a pagar y emite certificados oficiales separados para cada tributo.
 
