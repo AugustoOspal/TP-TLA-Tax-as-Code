@@ -1,5 +1,5 @@
 # Trabajo Práctico: Tax-as-Code
-**Materia:** Teoría de Lenguajes y Autómatas (TLA)  
+**Materia:** 72.39 Autómatas, Teoría de Lenguajes y Compiladores
 # Equipo G-124
 
 | Nombre | Apellido | Legajo | E-mail |
