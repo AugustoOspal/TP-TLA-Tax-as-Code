@@ -12,19 +12,19 @@
 
 **Tabla de Contenidos**
 
-1. [[#Introducción]]
-2. [[#Modelo Computacional]]
-   - 2.1. [[#Dominio]]
-   - 2.2. [[#Lenguaje]]
-3. [[#Implementación]]
-   - 3.1. [[#Frontend]]
-   - 3.2. [[#Backend]]
-   - 3.3. [[#Adicionales]]
-   - 3.4. [[#Dificultades Encontradas]]
-4. [[#Futuras Extensiones]]
-5. [[#Conclusiones]]
-6. [[#Referencias]]
-7. [[#Bibliografía]]
+1. Introducción
+2. Modelo Computacional
+   - 2.1. Dominio
+   - 2.2. Lenguaje
+3. Implementación
+   - 3.1. Frontend
+   - 3.2. Backend
+   - 3.3. Adicionales
+   - 3.4. Dificultades Encontradas
+4. Futuras Extensiones
+5. Conclusiones
+6. Referencias
+7. Bibliografía
 
 ---
 
